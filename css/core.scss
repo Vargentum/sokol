@@ -1,0 +1,651 @@
+@charset "utf-8";
+@import "compass/reset";
+//html5boilerplate
+@import "h5bp";
+@include h5bp-display;
+@include h5bp-chromeframe;
+@include h5bp-media;
+@include h5bp-base;
+@include h5bp-typography;
+@include h5bp-figures;
+@include h5bp-forms;
+@include h5bp-embeds;
+@include h5bp-tables;
+@include h5bp-helpers;
+//COMPASS
+@import "compass";
+@import "compass/layout/sticky-footer";
+//SPRITING
+//@import "/*.png";
+*,*:before,*:after,input[type=search]{@include box-sizing(border-box);}//border-box-sizing for all elems
+/*PT SANS*/
+@import url(http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic&subset=latin,cyrillic);
+/*PT SERIF*/
+@import url(http://fonts.googleapis.com/css?family=PT+Serif&subset=latin,cyrillic);
+
+/*===============================================================
+ VARIABLES
+===============================================================*/
+$baseWidth                : 1000px;
+$footerHeight             : 40px;
+// Assign colours to variable roles
+$baseFontColor                      : #333;
+$servColor                          : #666;
+$attentionColor                     : #cc0000;
+$bodyColor                          : #dfdfdf;
+//links colors
+$linkColor                          : $attentionColor;
+$hoverLinkColor                     : $attentionColor;
+$activeLinkColor                    : $attentionColor;
+$visitedLinkColor                   : $attentionColor;
+$focusedLinkColor                   : $attentionColor;
+//fonts
+$baseFamily                         : "PT Sans", sans-serif;
+$titleFamily                        : "PT Serif", serif;
+//misc
+$baseFontSize                       : 14px;
+$baseLineHeight                     : 1.4;
+$paragraphSpace                     : 15px;
+$inputHeight                        : 40px;
+//default vars
+$lmc-1                              : $linkColor !default;
+$lmc-2                              : $hoverLinkColor !default;
+$decorationType                     : dotted !default;
+$text-weight                        : normal !default;
+/*===============================================================
+ HELPER CLASSES
+===============================================================*/
+//Line helpers
+.hLine{&>*{@include inline-block;}}
+.hLine-top{
+  @extend .hLine;
+  &>*{vertical-align: top;}
+}
+.jLine{
+  text-align: justify;
+  line-height: 0;
+  font-size: 1px;
+  text-justify: newspaper;
+  zoom:1;
+  text-align-last: justify;
+  &:after{
+    content: "";
+    display: inline-block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    width: 100%;
+  }
+  >*{
+    text-align: left;
+    @include inline-block;
+    line-height: $baseLineHeight;
+    font-size: $baseFontSize;
+  }
+}
+.jLine-top{
+  @extend .jLine;
+  &>*{vertical-align: top;}
+}
+.fLine{
+  .flexbox &{@include display-box;}
+  .no-flexbox &{@extend .hLine;}
+}
+.fLine-full{
+  .flexbox &{
+    @include display-box;
+    @include box-pack(justify);
+    &>*{@include box-flex(1);}
+  }
+  .no-flexbox &{@extend .jLine;}
+}
+//State
+.is-hidden {
+  display: none;
+}
+.is-shown, .is-block {
+  display: block;
+}
+.is-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.is-lowercase {
+  text-transform: lowercase;
+}
+//Misc
+.pageWidth{
+  width:$baseWidth;
+  min-width: $baseWidth;
+  margin-left:auto;
+  margin-right: auto;
+  //$baseMinWidth: 980px;
+  //$baseMaxWidth: 1280px;
+}
+.pseudo-block{
+  content: '';
+  display: block;
+  position: absolute;
+}
+.pseudo-inline{
+  content: '';
+  @include inline-block;
+}
+.input-reset{
+  background-color: transparent;
+  border: none;
+  &:hover,&:focus{outline: none;}
+}
+.text-hide {
+  font: 0/0 serif;
+  text-shadow: none;
+  color: transparent;
+}
+:root .gradient {filter: none \0/IE9; }//hack for ie9 - need for gradient backgrounds
+.ie9-gradient-support{$experimental-support-for-svg: true; @extend .gradient;}
+.dl-inline{
+  @include pie-clearfix;
+  &>dt{float: left; margin-right: 5px;}
+}
+/*===============================================================
+ MIXINS
+===============================================================*/
+//RESPONSIVE
+@mixin respond-to($media) {
+  @if $media == ie10{
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {@content;}
+  }
+  @if $media == iphone{
+    @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {@content;}
+  }
+  @else if $media == ipad{
+    @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {@content;}
+  }
+}
+//RETINA
+@mixin image-2x($image, $width, $height) {
+  @media (min--moz-device-pixel-ratio: 1.3),
+  (-o-min-device-pixel-ratio: 2.6/2),
+  (-webkit-min-device-pixel-ratio: 1.3),
+  (min-device-pixel-ratio: 1.3),
+  (min-resolution: 1.3dppx) {
+  /* on retina, use image that's scaled by 2 */
+    background-image: url($image);
+    background-size: $width $height;
+  }
+}
+//Link Mixin Colors
+@mixin singleLink($lmc-1){@include link-colors($lmc-1,$lmc-1,$lmc-1,$lmc-1,$lmc-1);}
+@mixin simpleLink($lmc-1, $lmc-2){@include link-colors($lmc-1,$lmc-2,$lmc-1, $lmc-1, $lmc-2);}
+@mixin singleLink-custom($lmc-1, $decorationType){
+  @include singleLink($lmc-1);
+  text-decoration: none;
+  border-bottom: 1px $decorationType $lmc-1;
+}
+@mixin simpleLink-custom($lmc-1,$lmc-2,$decorationType){
+  @include simpleLink($lmc-1,$lmc-2);
+  text-decoration: none;
+  border-bottom: 1px $decorationType $lmc-1;
+  &:hover,&:focus{border-bottom-color: $lmc-2;}
+}
+//other mixins
+@mixin columnize($count){
+  .csscolumns &{@include column-count(#{$count});}
+}
+@mixin text($text-size, $text-color, $text-weight: $text-weight){
+  font-size: $text-size;
+  color: $text-color;
+  font-weight: $text-weight;
+}
+//img containers
+@mixin img-container-horisontal($width){
+  width:$width;
+  &>img{width:$width; height: auto;}
+}
+@mixin img-container-vertical($width){
+  height:$width;
+  &>img{height:$width; width: auto;}
+}
+/*===============================================================
+ SETTING UP FORMS
+===============================================================*/
+button{
+  border:none;
+  background-color: transparent;
+}
+label, select {
+  display: block;
+}
+input[type="search"] {
+  //-webkit-box-sizing: content-box;
+  //-moz-box-sizing: content-box;
+  -webkit-appearance: textfield;
+  //box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+textarea {
+  overflow: auto;
+  vertical-align: top;
+}
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"] {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 4px 0 0;
+  margin-top: 1px \9;
+  *margin-top: 0;
+  line-height: normal;
+  cursor: pointer;
+}
+input[type="file"],
+input[type="image"],
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+}
+select,
+input[type="file"] {
+  *margin-top: 4px; 				/* In IE7, the height of the select element cannot be changed by height, only font-size */
+}
+select:focus,
+input[type="file"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+  color:    $baseFontColor;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color:    $baseFontColor;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color:    $baseFontColor;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+  color:    $baseFontColor;
+}
+/*===============================================================
+CUSTOM TYPOGRAPHY
+===============================================================*/
+html, button, input, select, textarea {
+  font-family: $baseFamily;
+  color:$baseFontColor;
+}
+html{
+  height: 100%;
+}
+h1,h2,h3,h4,h5,h6,p,ul,ol{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+em{font-style: italic;}
+a{
+  @include link-colors($linkColor, $hoverLinkColor, $activeLinkColor, $visitedLinkColor, $focusedLinkColor);
+  @include single-transition($duration:.5s);
+  &:focus {outline: thin dotted;}
+  &:active,&:hover {outline: none;}
+  //text-decoration: underline;
+  //&:hover,&:focus{text-decoration: none;}
+}
+@include sticky-footer($footerHeight, ".b-stickyFooter_helper-1", ".b-stickyFooter_helper-2", ".b-footer");
+.b-typography{
+  margin:10px 0;
+  p{margin-bottom: $paragraphSpace;}
+  ul{
+    list-style-type: disc;
+    margin-bottom:$paragraphSpace;
+    //li{
+    //  position: relative;
+    //  &:before{
+    //    content: '-';
+    //    position: absolute;
+    //    right:100%;
+    //  }
+    //}
+  }
+  ol{
+    margin-bottom:$paragraphSpace;
+    list-style-type: decimal;
+  }
+  h1 {font-size: 2.2em;}
+  h2 {font-size: 1.7em;}
+  h3 {font-size: 1em; font-weight: bold;}
+  h4 {font-size: 0.9em;}
+  h5 {font-size: 0.8em;}
+  h6 {font-size: 0.7em;}
+}
+/*===============================================================
+DEVELOPER STYLES RUN BELOW THIS POINT
+===============================================================*/
+body {
+  height: 100%;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
+  background-image: inline-image("pattern-body.jpg");
+}
+.b-page{
+  @extend .pageWidth;
+  background-image: inline-image('pattern-noize.jpg');
+}
+/*OBJECTS-------------------------------*/
+.obj-{}
+
+/* HEADER -------------------------------*/
+.b-header{
+  position: relative;
+  padding: 0 35px;
+  background-image: inline-image('pattern-page.png');
+  @extend .jLine;
+  &>*{vertical-align: bottom;}
+}
+.b-header__right{
+  text-align: right;
+  width: 280px;
+}
+.b-logo{
+  text-decoration:none;
+  .name{@extend .text-hide; position:absolute;}
+}
+.b-slogan{
+  font: 17px $titleFamily;
+  color: $servColor;
+}
+.b-slogan__attention{
+  display: block;
+  color: $baseFontColor;
+  font-size: 28px;
+}
+.b-phone{
+  font: 18px $titleFamily;
+}
+.b-phone__attention{
+  display: block;
+  font-weight: bold;
+  font-size: 35px;
+}
+.b-social{
+  @extend .hLine;
+  color: $servColor;
+  @extend .hLine;
+  margin-bottom: 20px;
+}
+.b-social__unit{
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0 5px;
+}
+@for $i from 1 through 4{
+  .b-social__unit-#{$i}{
+    @extend .b-social__unit;
+    background-image: inline-image('social-#{$i}.png');
+  }
+}
+
+.b-address{
+  margin-bottom: 10px;
+  @extend .dl-inline;
+  dt{font-weight: bold;}
+}
+
+.b-mainNav{
+  background: image_url('bg-mainNav.png');
+  width: 1093px;
+  height: 79px;
+  position: relative;
+  padding-left: 70px;
+  margin-left:-50px;
+  margin-bottom: -25px;
+  &>ul{@extend .hLine;}
+}
+.b-mainNav__link{
+  display: block;
+  font:16px $titleFamily;
+  padding: 16px 22px;
+  @include singleLink(#fff);
+  position: relative;
+  text-transform: uppercase;
+  text-decoration: none;
+//  divider
+  &:before{
+    @extend .pseudo-block;
+    width: 0;
+    height: 21px;
+    border-left: 1px solid rgb(255,113,133);
+    border-right:1px solid rgb(37, 0, 0);
+    border-left-color:     rgba(255,113,133,.44);
+    border-right-color:    rgba(37, 0, 0, .44);
+    left: 0;
+    top:50%;
+    margin-top: -10px;
+  }
+  li:first-child &:before{display: none;}
+  &:hover,&:focus,&.active{
+    @include singleLink(#e0c39d);
+    font-family: "PT Serif", serif;
+    @include text-shadow(0 3px 2px rgba(2,3,3,.5));
+  }
+  &.active{font-weight: bold;}
+}
+.b-mainNav__link--virtualTour{
+  display: block;
+  position: relative;
+  top:1px;
+  @include singleLink($baseFontColor);
+  font:bold 18px "PT Serif", serif;
+  @include text-shadow(0 1px 0 rgba(255,255,255,.31));
+  padding: 14px 25px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* FOOTER -------------------------------*/
+.b-footer{
+  position: relative;
+  //@extend .pageWidth;
+}
+
+/* CONTENT -------------------------------*/
+.b-main{
+  position: relative;
+  z-index: 1;
+}
+.b-crumbs{
+  @extend .hLine;
+}
+.b-crumbs__unit{}
+
+/*INDEX page-----------------------*/
+.b-promo{
+
+}
+.b-promo__image{
+  background: inline-image('promo-image-shadow.png') 0 100% no-repeat;
+  img{
+    @include box-shadow(0 3px 3px rgba(2,3,3,.14));
+  }
+}
+.b-promo__places{
+  margin: 15px auto;
+}
+.b-promo__places__unit{
+  width: 310px;
+  @include inline-block;
+  margin: 0 4px;
+}
+.b-promo__places__unit__photo{
+  margin-bottom: -5px;
+  border:1px solid $baseFontColor;
+  width: 310px;
+  height: 200px;
+}
+.b-promo__places__unit__title{
+  padding: 0 20px;
+  background: inline-image('promo-place-titleBg.jpg');
+  height: 41px;
+  font: bold 20px/40px $titleFamily;
+  a{
+    text-decoration: none;
+    @include singleLink($baseFontColor);
+  }
+}
+.b-promo__places__unit__about{
+  background: inline-image('promo-place-footerBg.jpg');
+  font-size: 13px;
+  color: #999;
+  padding: 8px 20px;
+}
+
+.b-events--index{
+  background-color: #fff;
+  @include box-shadow(0 -2px 3px rgba(2,3,3,.25));
+}
+.b-events--index__header{
+  position: relative;
+  padding: 10px 30px;
+  @extend .jLine;
+  &:before{
+    @extend .pseudo-block;
+    width: 480px;
+    height: 1px;
+    background-color: #999;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    right: 165px;
+    top:50%;
+  }
+}
+.b-events--index__title{
+  font:30px $titleFamily;
+}
+.b-events--index__allEventsLink{
+  font: $baseFontSize $titleFamily;
+  @include singleLink($baseFontColor);
+  &:after{
+    @extend .pseudo-inline;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANCAYAAABlyXS1AAAAFklEQVQoU2NIS0v7z4APDG0Fg1MCCAALYxx+QumHMQAAAABJRU5ErkJggg==');
+    width: 7px;
+    height: 13px;
+    margin-left: 3px;
+  }
+}
+.b-events--index__carousel{
+  position: relative;
+  //bg for images
+  &:before{
+    @extend .pseudo-block;
+    width: 100%;
+    height: 200px;
+    background-image: inline-image('pattern-noize.jpg');
+    top:0;
+    left:0;
+  }
+}
+.b-events--index__unit{
+  width: 310px;
+  @include inline-block;
+  margin: 0 4px;
+}
+.b-events--index__unit__photo{
+  border:1px solid $baseFontColor;
+  width: 310px;
+  height: 200px;
+  margin-bottom: 5px;
+}
+.b-events--index__unit__time{
+  font: bold 13px $titleFamily;
+  @include inline-block;
+  vertical-align: top;
+  margin-top: -3px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 1px solid #999;
+  @include border-radius(2px);
+  @include background-clip(padding-box);
+  background-color: #ededed;
+  @include background-image(linear-gradient(top, #feffff 0%, rgba(255,255,255,0) 100%));
+  @extend .ie9-gradient-support;
+}
+.b-events--index__unit__name{
+  font: bold $baseFontSize $titleFamily;
+  text-transform: uppercase;
+  @include inline-block;
+}
+/*SOME page------------------------*/
+
+/*PLUGINS styles -------------------*/
+.js-carousel__wrap{
+  position: relative;
+  padding-left: 23px;
+  padding-right: 18px;
+  .js-carousel__prev{
+    position: absolute;
+    left: 3px;
+    top:200px /2 - 35;
+  }
+  .js-carousel__next{
+    left: auto;
+    right: 3px;
+  }
+}
+.js-carousel__prev{
+  @include single-transition(none);
+  display: block;
+  width: 21px;
+  height: 81px;
+  background-image: inline-image('carousel-prev.png');
+  &:hover,&:focus{
+    background-image: inline-image('carousel-prev-active.png');
+    height: 77px;
+  }
+}
+.js-carousel__next{
+  @extend .js-carousel__prev;
+  background-image: inline-image('carousel-next.png');
+  &:hover,&:focus{background-image: inline-image('carousel-next-active.png');}
+}
+//FF special
+@-moz-document url-prefix() {}
+
+//debug grid
+//* { outline: 2px dotted red; }
+//* * { outline: 2px dotted green; }
+//* * * { outline: 2px dotted orange; }
+//* * * * { outline: 2px dotted blue; }
+//* * * * * { outline: 1px solid red; }
+//* * * * * * { outline: 1px solid green; }
+//* * * * * * * { outline: 1px solid orange; }
+//* * * * * * * * { outline: 1px solid blue; }
