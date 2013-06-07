@@ -37,10 +37,16 @@ $(function(){
     }
 });
 $(window).load(function(){
-    $('.b-events--index__unit').each(function(){
-        $time = $(this).find('.b-events--index__unit__time');
-        $name = $(this).find('.b-events--index__unit__name');
-        $nameWidth = $(this).width() - $time.width() - 30;
-        $name.css('width', $nameWidth);
-    });
+    /*set rigth block width depending on left block width */
+    function configureWidth( parent, leftBlock, rightBlock){
+        $(parent).each(function(){
+            $leftBlock = $(this).find(leftBlock);
+            $rightBlock = $(this).find(rightBlock);
+            $rightBlockWidth = $(this).width() - $leftBlock.width() - 30;
+            $rightBlock.css('width', $rightBlockWidth);
+        });
+    }
+    configureWidth('.b-events--index__unit', '.b-events--index__unit__time', '.b-events--index__unit__name');
+    configureWidth('.b-template--reportsList__unit', '.b-template--reportsList__unit__time', '.b-template--reportsList__unit__name');
+
 });
